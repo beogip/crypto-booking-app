@@ -97,6 +97,7 @@ class Booking {
           $set: data,
         }).exec();
     } catch (e) {
+      console.log(e)
       if (!e.errors) {
         if (e.code === 11000) {
           throw handleApplicationError('duplicateBooking');

@@ -41,16 +41,26 @@ describe('Booking controller', () => {
   it('Should throw an error on creating an invalid booking', async () => {
     validBooking.guestEthAddress = `0xe91036d59eAd8b654eE2F5b354245f6D7eD2487e${Date.now()}`;
     try {
-      await Booking.create(Object.assign({}, validBooking, { paymentAmount: 'asdasd' }));
+      await Booking.create(Object.assign({}, validBooking, { roomType: -1 }));
       throw Error('should not be called');
     } catch (e) {
       expect(e.code).to.be.equal('#invalidPaymentAmount');
     }
   });
 
+  it('Should throw an error on creating an invalid booking', async () => {
+    validBooking.guestEthAddress = `0xe91036d59eAd8b654eE2F5b354245f6D7eD2487e${Date.now()}`;
+    try {
+      await Booking.create(Object.assign({}, validBooking, { to: 0 }));
+      throw Error('should not be called');
+    } catch (e) {
+      expect(e.code).to.be.equal('#toOutOfRange');
+    }
+  });
+
   it('Should store the personalInfo encoded', async () => {
     validBooking.guestEthAddress = `0xe91036d59eAd8b654eE2F5b354245f6D7eD2487e${Date.now()}`;
-    const booking = await Booking.create(validBooking);
+    const {booking} = await Booking.create(validBooking);
     const dbBooking = await BookingModel.findById(booking.id).exec();
     expect(dbBooking).to.be.an('object');
     expect(utils.isHex(dbBooking.personalInfo)).to.be.equal(true);
